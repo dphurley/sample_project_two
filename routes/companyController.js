@@ -22,6 +22,50 @@ router.get('/', (request, response) => {
         })
 })
 
+// NEW route
+router.get('/new', (request, response) => {
+    response.render('companies/new')
+})
+
+// CREATE route
+router.post('/', (request, response) => {
+
+    const newCompany = request.body
+
+    CompanyModel.create(newCompany)
+        .then(() => {
+            response.redirect('/companies')
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+})
+
+// EDIT route
+router.get('/:companyId/edit', (request, response) => {
+
+    const companyId = request.params.companyId
+
+    CompanyModel.findById(companyId)
+        .then((company) => {
+            response.render('companies/edit', {
+                company: company
+            })
+        })
+})
+
+// UPDATE route
+router.put('/:companyId', (request, response) => {
+
+    const companyId = request.params.companyId
+    const updatedCompany = request.body
+
+    CompanyModel.findByIdAndUpdate(companyId, updatedCompany, { new: true })
+        .then(() => {
+            response.redirect(`/companies/${companyId}`)
+        })
+})
+
 // SHOW route
 router.get('/:companyId', (request, response) => {
 
@@ -38,5 +82,15 @@ router.get('/:companyId', (request, response) => {
         })
 })
 
+// DELETE route
+router.get('/:companyId/delete', (request, response) => {
+
+    const companyId = request.params.companyId
+
+    CompanyModel.findByIdAndRemove(companyId)
+        .then(() => {
+            response.redirect('/companies')
+        })
+})
 
 module.exports = router

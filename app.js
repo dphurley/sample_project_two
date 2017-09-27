@@ -38,8 +38,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Register Controllers
-var index = require('./routes/index');
-app.use('/', index);
+var indexController = require('./routes/indexController');
+app.use('/', indexController);
 
 const companyController = require('./routes/companyController')
 app.use('/companies', companyController)
