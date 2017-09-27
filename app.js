@@ -6,22 +6,19 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
 var mongoose = require('mongoose');
-mongoose.connect(process.env.MONGODB_URI);
+
+// Database Set-up
+mongoose.Promise = global.Promise
+mongoose.connect(process.env.MONGODB_URI, {useMongoClient: true});
 
 const db = mongoose.connection
-
 db.on('error', (error) => {
   console.log(error)
 })
-
 db.once('open', () => {
-  console.log('Connected to MongoDB')
+  console.log('Connected to MongoDB!')
 })
-
-var index = require('./routes/index');
-var users = require('./routes/users');
 
 var app = express();
 
@@ -37,18 +34,25 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Register Controllers
+var index = require('./routes/index');
 app.use('/', index);
-app.use('/users', users);
+
+const companyController = require('./routes/companyController')
+app.use('/companies', companyController)
+
+const snowboardController = require('./routes/snowboardController')
+app.use('/companies/:companyId/snowboards', snowboardController)
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
